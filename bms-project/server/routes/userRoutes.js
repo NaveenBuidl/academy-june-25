@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
 const userRouter = express.Router();
@@ -11,7 +12,7 @@ userRouter.post("/register", async (req, res) => {
     if (userExists) {
       return res.send({
         success: false,
-        message: "User Already Exists"
+        message: "User Already Exists",
       });
     }
 
@@ -20,7 +21,7 @@ userRouter.post("/register", async (req, res) => {
 
     res.send({
       success: true,
-      message: "Registration successful, Please login."
+      message: "Registration successful, Please login.",
     });
   } catch (err) {
     console.log(err);
@@ -42,6 +43,10 @@ userRouter.post("/login", async (req, res) => {
       });
     }
 
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
     if (req.body.password !== user.password) {
       return res.send({
         success: false,
@@ -52,6 +57,7 @@ userRouter.post("/login", async (req, res) => {
     res.send({
       success: true,
       message: "You've successfully logged in!",
+      data: token
     });
   } catch (error) {
     console.error(error);
@@ -61,6 +67,5 @@ userRouter.post("/login", async (req, res) => {
     });
   }
 });
-
 
 module.exports = userRouter;
