@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const registerUser = async (req, res) => {
   try {
@@ -11,6 +12,11 @@ const registerUser = async (req, res) => {
         message: "User Already Exists",
       });
     }
+
+    // Hash the password before saving in DB
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    req.body.password = hashedPassword;
 
     const newUser = new User(req.body);
     await newUser.save();
@@ -39,16 +45,18 @@ const loginUser = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-
-    if (req.body.password !== user.password) {
+    // Validate Password
+    const validPassword = await bcrypt.compare(req.body.password, user.password);
+    if (!validPassword) {
       return res.send({
         success: false,
         message: "Sorry, invalid password entered!",
       });
     }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
     res.send({
       success: true,
