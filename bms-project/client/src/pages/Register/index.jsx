@@ -6,8 +6,10 @@ const Register = () => {
   const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (values) => {
+    console.log(values);
     try {
-      const response = await RegisterUser(values);
+      // const response = await RegisterUser(values);
+      const response = {};
       if (response.success) {
         messageApi.open({
           type: "success",
@@ -97,12 +99,12 @@ const Register = () => {
                 htmlFor="isAdmin"
                 name="isAdmin"
                 className="d-block text-center"
-                initialValue={false}
+                initialValue={"user"}
               >
                 <div style={{ display: "flex", justifyContent: "start" }}>
                   <Radio.Group name="radiogroup" className="flex-start">
-                    <Radio value={true}>Yes</Radio>
-                    <Radio value={false}>No</Radio>
+                    <Radio value={"partner"}>Yes</Radio>
+                    <Radio value={"user"}>No</Radio>
                   </Radio.Group>
                 </div>
               </Form.Item>

@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Forget from "./pages/Forget";
 import Admin from "./pages/Admin";
+import Profile from "./pages/Profile";
+import Partner from "./pages/Partner";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -28,6 +30,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Admin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/partner"
+              element={
+                <ProtectedRoute>
+                  <Partner />
                 </ProtectedRoute>
               }
             />
