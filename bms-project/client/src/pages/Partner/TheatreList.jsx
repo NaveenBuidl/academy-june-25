@@ -6,12 +6,14 @@ import { Button, Table } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import TheatreDelete from "./TheatreDelete";
 import TheatreModal from "./TheatreForm";
+import ShowModal from "./ShowModal";
 
 const TheatreList = () => {
   const { user } = useSelector((state) => state.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedTheatre, setSelectedTheatre] = useState(null);
+  const [isShowModalOpen, setIsShowModalOpen] = useState(false);
   const [formType, setFormType] = useState("add");
   const [theatres, setTheatres] = useState(null);
   const dispatch = useDispatch();
@@ -59,7 +61,10 @@ const TheatreList = () => {
             {data.isActive && (
               <Button
                 style={{ marginLeft: "4px" }}
-                onClick={() => {}}
+                onClick={() => {
+                  setIsShowModalOpen(true);
+                  setSelectedTheatre(data);
+                }}
               >
                 Add Shows
               </Button>
@@ -120,6 +125,14 @@ const TheatreList = () => {
           getData={getData}
         />
       )}
+      {isShowModalOpen && (
+        <ShowModal
+          isShowModalOpen={isShowModalOpen}
+          selectedTheatre={selectedTheatre}
+          setIsShowModalOpen={setIsShowModalOpen}
+        />
+      )}
+      ;
     </div>
   );
 };
