@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Card, Row, Col, Button } from "antd";
 import moment from "moment";
 import StripeCheckout from "react-stripe-checkout";
+import { bookShow, makePayment } from "../../apicalls/bookings";
 
 function BookShow() {
   const { user } = useSelector((state) => state.user);
@@ -89,6 +90,45 @@ function BookShow() {
     );
   };
 
+  const bookSeatForUser = async (transactionId) => {
+    try {
+      dispatch(showLoading());
+      const response = await bookShow({
+        show: params.showId,
+        transactionId,
+        seats: selectedSeats,
+        user: user._id
+      });
+      if (response.success) {
+        navigate("/profile");
+      } else {
+        console.error("Something went wrong");
+      }
+      dispatch(hideLoading());
+    } catch (err) {
+      console.error("Error =>", err);
+      dispatch(hideLoading());
+    }
+  };
+
+  const onToken = async (token) => {
+    try {
+      dispatch(showLoading());
+      const response = await makePayment({
+        token: token,
+        amount: selectedSeats.length * show.ticketPrice
+      });
+      if (response.success) {
+        bookSeatForUser(response.data);
+        console.log(response);
+      }
+      dispatch(hideLoading());
+    } catch(err) {
+      console.error("Error =>", err);
+      dispatch(hideLoading());
+    }
+  };
+
   useEffect(() => {
     const getShowDetails = async () => {
       try {
@@ -145,6 +185,20 @@ function BookShow() {
               style={{ width: "100%" }}
             >
               {getSeats()} {/* Rendering dynamic seat layout */}
+              {selectedSeats.length > 0 && (
+                <StripeCheckout
+                  token={onToken}
+                  billingAddress
+                  amount={selectedSeats.length * show.ticketPrice}
+                  stripeKey="pk_test_51R6BX1KpJJuQX1KFHmG7ywHU3Pcyydm5i4jOa2LVeeIUpRY0ErAiOwYWNcynjyLSRvKLX1f85ACP726K7kk6uLcN004qMOO0RB"
+                >
+                  <div className="max-width-600 mx-auto">
+                    <Button type="primary" shape="round" size="large" block>
+                      Pay Now
+                    </Button>
+                  </div>
+                </StripeCheckout>
+              )}
             </Card>
           </Col>
         </Row>
