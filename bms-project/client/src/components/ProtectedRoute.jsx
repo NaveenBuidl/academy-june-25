@@ -67,7 +67,6 @@ const ProtectedRoute = ({ children }) => {
     try {
       dispatch(showLoading());
       const response = await GetCurrentUser();
-      console.log(response.status);
       if (response?.status === 401) {
         localStorage.removeItem("token");
         navigate("/login");

@@ -10,6 +10,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import Movie from "./pages/Movie";
+import BookShow from "./pages/BookShow";
 
 function App() {
   return (
@@ -22,6 +24,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/movies/:movieId"
+              element={
+                <ProtectedRoute>
+                  <Movie />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/book-show/:showId"
+              element={
+                <ProtectedRoute>
+                  <BookShow />
                 </ProtectedRoute>
               }
             />
