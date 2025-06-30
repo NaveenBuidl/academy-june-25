@@ -12,6 +12,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import Movie from "./pages/Movie";
 import BookShow from "./pages/BookShow";
+import Reset from "./pages/Reset";
 
 function App() {
   return (
@@ -70,6 +71,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forget" element={<Forget />} />
+            <Route path="/reset" element={<Reset />} />
           </Routes>
         </BrowserRouter>
       </Provider>

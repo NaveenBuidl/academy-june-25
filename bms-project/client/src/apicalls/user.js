@@ -20,6 +20,32 @@ export const LoginUser = async (payload) => {
   }
 };
 
+// Forgot password
+export const ForgetPassword = async (value) => {
+  try {
+    const response = await axiosInstance.patch(
+      "/api/users/forgetpassword",
+      value
+    );
+    return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+// Reste password
+export const ResetPassword = async (value) => {
+  try {
+    const response = await axiosInstance.patch(
+      "/api/users/resetpassword",
+      value
+    );
+    return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 // Get Current User Details
 export const GetCurrentUser = async () => {
   try {

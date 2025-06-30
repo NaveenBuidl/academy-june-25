@@ -8,12 +8,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["admin", "user", "partner"],
     required: true,
-    default: "user"
-  }
+    default: "user",
+  },
+  otp: { type: String },
+  otpExpiry: {
+    type: Date,
+  },
 });
 
 // Pre-save hook
-userSchema.pre("save", function(next) {
+userSchema.pre("save", function (next) {
   console.log("Pre-save hook");
   const now = new Date();
   this.updatedAt = now;
