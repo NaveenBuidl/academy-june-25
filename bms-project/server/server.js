@@ -23,10 +23,6 @@ app.use("/api/theatre", theatreRouter); // Route for all theatre operations
 app.use("/api/show", showRouter); // Route for all show operation
 app.use("/api/booking", bookingRouter); // Route for all booking operation
 
-app.use((req, res) => {
-  res.status(404).send("Page not found!!!");
-});
-
 app.listen(8082, () => {
   console.log("Server is running");
 });
@@ -36,4 +32,8 @@ const publicPath = path.join(__dirname, "../client/dist");
 app.use(express.static(publicPath));
 app.get("*", (req, res) => {
   res.sendFile(path.join(publicPath, "index.html"));
+});
+
+app.use((req, res) => {
+  res.status(404).send("Page not found!!!");
 });
