@@ -1,15 +1,16 @@
 import { Button, Form, Input, Radio, message } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RegisterUser } from "../../apicalls/user";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (values) => {
     console.log(values);
     try {
-      // const response = await RegisterUser(values);
-      const response = {};
+      const response = await RegisterUser(values);
+      console.log(response);
       if (response.success) {
         messageApi.open({
           type: "success",
@@ -96,8 +97,8 @@ const Register = () => {
 
               <Form.Item
                 label="Register as a Partner"
-                htmlFor="isAdmin"
-                name="isAdmin"
+                htmlFor="role"
+                name="role"
                 className="d-block text-center"
                 initialValue={"user"}
               >

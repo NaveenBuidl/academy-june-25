@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 const userRouter = require("./routes/userRoutes");
 const movieRouter = require("./routes/movieRoutes");
 const theatreRouter = require("./routes/theatreRoutes");
@@ -25,13 +24,6 @@ app.use("/api/booking", bookingRouter); // Route for all booking operation
 
 app.listen(8082, () => {
   console.log("Server is running");
-});
-
-const publicPath = path.join(__dirname, "../client/dist");
-
-app.use(express.static(publicPath));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(publicPath, "index.html"));
 });
 
 app.use((req, res) => {
