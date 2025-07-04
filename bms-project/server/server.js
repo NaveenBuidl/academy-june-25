@@ -1,4 +1,6 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
+const path = require("path");
 const cors = require("cors");
 const userRouter = require("./routes/userRoutes");
 const movieRouter = require("./routes/movieRoutes");
@@ -13,8 +15,18 @@ require("./config/db.js");
 
 const app = express();
 
+// Rate Limiter Middleware
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs (defined above)
+  message: "Too many requests from this IP. Please, try again in 15 minutes",
+});
+
 app.use(express.json());
 app.use(cors());
+
+// Apply rate limiter to all API routes
+app.use("/api/", apiLimiter);
 
 app.use("/api/users", userRouter); // Route for all user operations
 app.use("/api/movies", movieRouter); // Route for all movie operations
@@ -24,6 +36,12 @@ app.use("/api/booking", bookingRouter); // Route for all booking operation
 
 app.listen(8082, () => {
   console.log("Server is running");
+});
+
+const publicPath = path.join(__dirname, "../client/dist");
+app.use(express.static(publicPath));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(publicPath, "index.html"));
 });
 
 app.use((req, res) => {

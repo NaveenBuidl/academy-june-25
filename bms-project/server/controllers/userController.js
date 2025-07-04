@@ -51,13 +51,13 @@ const loginUser = async (req, res) => {
     }
 
     // Validate Password
-    // const validPassword = await bcrypt.compare(req.body.password, user.password);
-    // if (!validPassword) {
-    //   return res.send({
-    //     success: false,
-    //     message: "Sorry, invalid password entered!",
-    //   });
-    // }
+    const validPassword = await bcrypt.compare(req.body.password, user.password);
+    if (!validPassword) {
+      return res.send({
+        success: false,
+        message: "Sorry, invalid password entered!",
+      });
+    }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
