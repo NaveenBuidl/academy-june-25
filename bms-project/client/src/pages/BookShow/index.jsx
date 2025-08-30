@@ -3,18 +3,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { hideLoading, showLoading } from "../../redux/loaderSlice";
 import { getShowById } from "../../apicalls/show";
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, Row, Col, Button } from "antd";
+import { Card, Row, Col, Button, Modal } from "antd";
 import moment from "moment";
-import StripeCheckout from "react-stripe-checkout";
-import { bookShow, makePayment } from "../../apicalls/bookings";
-// const stripeKey = import.meta.env.STRIPE_PUBLISHABLE_KEY;
-const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import PaymentForm from '../../components/PaymentForm';
+import { bookShow } from "../../apicalls/bookings";
 
+// const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+console.log('Stripe Key:', import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 function BookShow() {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [show, setShow] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const params = useParams();
   const navigate = useNavigate();
 
@@ -102,6 +106,7 @@ function BookShow() {
         user: user._id
       });
       if (response.success) {
+        setShowPaymentModal(false);
         navigate("/profile");
       } else {
         console.error("Something went wrong");
@@ -113,22 +118,8 @@ function BookShow() {
     }
   };
 
-  const onToken = async (token) => {
-    try {
-      dispatch(showLoading());
-      const response = await makePayment({
-        token: token,
-        amount: selectedSeats.length * show.ticketPrice
-      });
-      if (response.success) {
-        bookSeatForUser(response.data);
-        console.log(response);
-      }
-      dispatch(hideLoading());
-    } catch(err) {
-      console.error("Error =>", err);
-      dispatch(hideLoading());
-    }
+  const handlePaymentSuccess = (transactionId) => {
+    bookSeatForUser(transactionId);
   };
 
   useEffect(() => {
@@ -143,12 +134,13 @@ function BookShow() {
         }
         dispatch(hideLoading());
       } catch (err) {
+        console.error("Error fetching show details:", err);
         navigate("/");
       }
     };
 
     getShowDetails();
-  }, []);
+  }, [dispatch, navigate, params.showId]);
 
   return (
     <>
@@ -188,24 +180,37 @@ function BookShow() {
             >
               {getSeats()} {/* Rendering dynamic seat layout */}
               {selectedSeats.length > 0 && (
-                <StripeCheckout
-                  token={onToken}
-                  billingAddress
-                  amount={selectedSeats.length * show.ticketPrice}
-                  stripeKey={stripeKey}
-                  // stripeKey="pk_test_51R6BX1KpJJuQX1KFGaUR8e4XFaom8yY36nNjvjC3r8uxmnfq9lCxFnQqTEXZWx0Y3uDc9k1hcX4pfqHKdWMeDSkc00BB2DyiAF"
-                >
-                  <div className="max-width-600 mx-auto">
-                    <Button type="primary" shape="round" size="large" block>
-                      Pay Now
-                    </Button>
-                  </div>
-                </StripeCheckout>
+                <div className="max-width-600 mx-auto">
+                  <Button 
+                    type="primary" 
+                    shape="round" 
+                    size="large" 
+                    block
+                    onClick={() => setShowPaymentModal(true)}
+                  >
+                    Pay Now - Rs. {selectedSeats.length * show.ticketPrice}
+                  </Button>
+                </div>
               )}
             </Card>
           </Col>
         </Row>
       )}
+
+      <Modal
+        title="Complete Payment"
+        open={showPaymentModal}
+        onCancel={() => setShowPaymentModal(false)}
+        footer={null}
+        width={500}
+      >
+        <Elements stripe={stripePromise}>
+          <PaymentForm 
+            amount={selectedSeats.length * show?.ticketPrice || 0}
+            onPaymentSuccess={handlePaymentSuccess}
+          />
+        </Elements>
+      </Modal>
     </>
   );
 }

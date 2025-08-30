@@ -10,26 +10,63 @@ const EmailHelper = require("../util/EmailHelper");
 const makePayment = async (req, res) => {
   try {
     console.log(req.body, 'payment request');
-    const { token, amount } = req.body;
-    // console.log(token.email, token.id);
-
-    const paymentIntent = await stripe.charges.create({
-      amount: amount, // Amount always needs to be in INR
+    // const { token, amount } = req.body;
+    const { amount } = req.body;
+    
+    // Create a Payment Intent using the modern Stripe API
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100, // Convert to paise (smallest currency unit for INR)
       currency: "inr",
-      // receipt_email: token.email,
-      source: "tok_visa",
-      description: "Booking Movie",
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      description: "Movie Ticket Booking",
+      metadata: {
+        booking_type: "movie_ticket"
+      }
     });
-
-    const transactionId = paymentIntent.id;
 
     res.send({
       success: true,
-      message:
-        "Payment Processing. You will receive a confirmation once the payment is complete.",
-      data: transactionId,
+      message: "Payment intent created successfully",
+      data: {
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      }
     });
   } catch (err) {
+    console.error("Payment error:", err);
+    res.status(500).send({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+const confirmPayment = async (req, res) => {
+  try {
+    const { paymentIntentId } = req.body;
+    
+    // Retrieve the payment intent to check its status
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    
+    if (paymentIntent.status === 'succeeded') {
+      res.send({
+        success: true,
+        message: "Payment confirmed successfully",
+        data: {
+          transactionId: paymentIntent.id,
+          status: paymentIntent.status
+        }
+      });
+    } else {
+      res.status(400).send({
+        success: false,
+        message: `Payment not completed. Status: ${paymentIntent.status}`
+      });
+    }
+  } catch (err) {
+    console.error("Payment confirmation error:", err);
     res.status(500).send({
       success: false,
       message: err.message,
@@ -117,4 +154,4 @@ const getAllBookings = async (req, res) => {
   }
 };
 
-module.exports = { makePayment, bookShow, getAllBookings };
+module.exports = { makePayment, confirmPayment, bookShow, getAllBookings };
