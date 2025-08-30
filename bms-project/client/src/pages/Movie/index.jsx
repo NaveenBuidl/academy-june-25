@@ -13,13 +13,16 @@ const Movie = () => {
   const [movie, setMovie] = useState(null);
   const [searchParams] = useSearchParams();
   const [date, setDate] = useState(moment(searchParams.get("date")).format("YYYY-MM-DD"));
+  // const [date, setDate] = useState(moment().format("YYYY-MM-DD"));
   const [theatres, setTheatres] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleDate = (e) => {
-    setDate(moment(e.target.value)).format("YYYY-MM-DD");
-    navigate(`/movie/${params.movieId}?date=${e.target.value}`);
+    // debugger;
+
+    setDate(moment(e.target.value).format("YYYY-MM-DD"));
+    navigate(`/movies/${params.movieId}?date=${e.target.value}`);
   };
 
   useEffect(() => {

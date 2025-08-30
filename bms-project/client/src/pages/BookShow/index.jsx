@@ -7,6 +7,8 @@ import { Card, Row, Col, Button } from "antd";
 import moment from "moment";
 import StripeCheckout from "react-stripe-checkout";
 import { bookShow, makePayment } from "../../apicalls/bookings";
+// const stripeKey = import.meta.env.STRIPE_PUBLISHABLE_KEY;
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
 function BookShow() {
   const { user } = useSelector((state) => state.user);
@@ -190,7 +192,8 @@ function BookShow() {
                   token={onToken}
                   billingAddress
                   amount={selectedSeats.length * show.ticketPrice}
-                  stripeKey="pk_test_51R6BX1KpJJuQX1KFGaUR8e4XFaom8yY36nNjvjC3r8uxmnfq9lCxFnQqTEXZWx0Y3uDc9k1hcX4pfqHKdWMeDSkc00BB2DyiAF"
+                  stripeKey={stripeKey}
+                  // stripeKey="pk_test_51R6BX1KpJJuQX1KFGaUR8e4XFaom8yY36nNjvjC3r8uxmnfq9lCxFnQqTEXZWx0Y3uDc9k1hcX4pfqHKdWMeDSkc00BB2DyiAF"
                 >
                   <div className="max-width-600 mx-auto">
                     <Button type="primary" shape="round" size="large" block>

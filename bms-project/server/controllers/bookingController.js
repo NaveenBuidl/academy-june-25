@@ -1,19 +1,22 @@
 const Booking = require("../models/bookingModel");
-const stripe = require("stripe")(
-  "sk_test_51R6BX1KpJJuQX1KFVHq4PQeKRIEYkNpW1Os9ICs5tijrpQMoUl1zxlom4P9H7KQU6wI2FrSv06XNgRbXYuEk0C9F00kG2S1Mjb"
-);
+// const stripe = require("stripe")(
+//   "sk_test_51R6BX1KpJJuQX1KFVHq4PQeKRIEYkNpW1Os9ICs5tijrpQMoUl1zxlom4P9H7KQU6wI2FrSv06XNgRbXYuEk0C9F00kG2S1Mjb"
+// );
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 const Show = require("../models/showModel");
 const EmailHelper = require("../util/EmailHelper");
 
 const makePayment = async (req, res) => {
   try {
+    console.log(req.body, 'payment request');
     const { token, amount } = req.body;
-    console.log(token.email, token.id);
+    // console.log(token.email, token.id);
 
     const paymentIntent = await stripe.charges.create({
-      amount: amount, // Amount always needs to be in cents
-      currency: "usd",
-      receipt_email: token.email,
+      amount: amount, // Amount always needs to be in INR
+      currency: "inr",
+      // receipt_email: token.email,
       source: "tok_visa",
       description: "Booking Movie",
     });

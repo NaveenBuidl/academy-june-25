@@ -1,3 +1,4 @@
+const helmet = require("helmet");
 const express = require("express");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
@@ -29,7 +30,8 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "example.com", "scaler.com"], // Allow scripts from 'self', example.com, and scaler.com
       styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (unsafe)
-      imgSrc: ["'self'", "data:", "example.com"], // Allow images from 'self', data URLs, and example.com
+      // imgSrc: ["'self'", "data:", "example.com"], // Allow images from 'self', data URLs, and example.com
+      imgSrc: ["'self'", "data:", "example.com", "upload.wikimedia.org", "m.media-amazon.com", "via.placeholder.com"],
       connectSrc: ["'self'", "api.example.com"], // Allow connections to 'self' and api.example.com
       fontSrc: ["'self'", "fonts.gstatic.com"], // Allow fonts from 'self' and fonts.gstatic.com
       objectSrc: ["'none'"], // Disallow object, embed, and applet elements
@@ -45,8 +47,9 @@ const apiLimiter = rateLimit({
   message: "Too many requests from this IP. Please, try again in 15 minutes",
 });
 
+
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: process.env.CLIENT_URL }));
 
 // Apply rate limiter to all API routes
 app.use("/api/", apiLimiter);
@@ -57,8 +60,10 @@ app.use("/api/theatre", theatreRouter); // Route for all theatre operations
 app.use("/api/show", showRouter); // Route for all show operation
 app.use("/api/booking", bookingRouter); // Route for all booking operation
 
-app.listen(8082, () => {
-  console.log("Server is running");
+
+const PORT = process.env.PORT || 8082;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 const publicPath = path.join(__dirname, "../client/dist");

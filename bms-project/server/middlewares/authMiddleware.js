@@ -6,8 +6,11 @@ const auth = (req, res, next) => {
 
     const verifiedtoken = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.body = {};
-    req.body.userId = verifiedtoken.userId;
+    // req.body = {};
+    // req.body.userId = verifiedtoken.userId;
+    if (req && req.body) {
+      req.body.userId = verifiedtoken.userId;
+    }
 
     next();
   } catch (err) {

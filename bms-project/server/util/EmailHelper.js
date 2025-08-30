@@ -21,7 +21,7 @@ async function EmailHelper(templateName, receiverEmail, creds) {
 
     const emailDetails = {
       to: receiverEmail,
-      from: "shashwatbagaria5@gmail.com",
+      from: process.env.EMAIL_FROM,
       subject: "Mail from Scaler Shows",
       text: `Hi ${creds.name}, this is your reset otp ${creds.otp}`,
       html: replaceContent(content, creds),

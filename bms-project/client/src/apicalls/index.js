@@ -3,7 +3,8 @@ import axios from "axios";
 const token = localStorage.getItem("token");
 
 export const axiosInstance = axios.create({
-  baseURL: "https://academy-june-25.onrender.com",
+  // baseURL: "https://academy-june-25.onrender.com",
+  baseURL: "http://localhost:5000",
   headers: {
     withCredentials: true,
     "Content-Type": "application/json",
